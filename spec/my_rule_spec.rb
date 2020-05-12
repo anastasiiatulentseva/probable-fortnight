@@ -42,7 +42,7 @@ RSpec.describe MyRule do
         year_rule.events.select { |event| event.to_date == Date.today.next_week }
       end
 
-      expect(time.to_i).to be_between(0, 2)
+      expect(time).to be <= 2
     end
 
     it 'works inside schedule as well' do
