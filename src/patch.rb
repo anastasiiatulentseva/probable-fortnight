@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # new rule
 module Montrose
   module Rule
@@ -15,7 +17,8 @@ module Montrose
 
       def include?(time)
         return true if @last_tick.nil?
-        time - @last_tick > @throttle_for
+
+        time - @last_tick >= @throttle_for
       end
 
       def advance!(time)
@@ -39,7 +42,7 @@ end
 Montrose::Stack.singleton_class.prepend(Module.new do
   def build(opts = {})
     super + [
-        Montrose::Rule::ThrottleFor,
+      Montrose::Rule::ThrottleFor
     ].map { |r| r.from_options(opts) }.compact
   end
 end)
