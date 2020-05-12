@@ -39,7 +39,7 @@ RSpec.describe MyRule do
 
     it 'selects events quite fast' do
       time = Benchmark.realtime do
-        year_rule.events.select { |event| event.to_date == Date.today.next_week }
+        year_rule.events.take_while{|event| event.to_date <= Date.today.next_week}.select { |event| event.to_date == Date.today.next_week }
       end
 
       expect(time).to be <= 2
