@@ -1,6 +1,6 @@
 ### Patch to [Montrose](https://github.com/rossta/montrose) ruby gem
 
-Add `TrottleFor` option to `Montrose::Rule`
+Add `ThrottleFor` option to `Montrose::Rule`
 (for use with Montrose.minutely)
 It allows to start events at exact time that set up with `during` interval.
  
@@ -28,7 +28,7 @@ instead of expected
      2020-05-12 4:20pm,
      2020-05-12 4:50pm]
 ```
-With `TrottleFor` option event generation 'stops' until next time interval (as shown above)
+With `ThrottleFor` option event generation 'stops' until next time interval (as shown above)
 ``` 
   Montrose.minutely(
      throttle_for: 30 * 60, # every 30 minutes

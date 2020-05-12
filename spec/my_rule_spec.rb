@@ -1,15 +1,25 @@
 # frozen_string_literal: true
+require 'benchmark'
 
 RSpec.describe MyRule do
   describe 'during split' do
     let(:rule) { described_class.new(%w[3:00pm-3:20pm 4:20pm-4:40pm], 30) }
     let(:events) { rule.events.to_a }
-    let(:longlasting_rule) do
+    let(:week_rule) do
       described_class.new(
         %w[3:00pm-3:20pm 4:20pm-4:40pm],
         17,
         Date.today.at_beginning_of_day,
         Date.today.next_week.at_beginning_of_day
+      )
+    end
+
+    let(:year_rule) do
+      described_class.new(
+        %w[9:00am-1:00pm 2:00pm-5:45pm],
+        45,
+        Date.today.at_beginning_of_day,
+        Date.today.next_year.at_beginning_of_day
       )
     end
 
@@ -23,8 +33,16 @@ RSpec.describe MyRule do
     end
 
     it 'creates events started exact same time from day to day' do
-      slots = longlasting_rule.events.map { |v| v.strftime('%H:%M') }.uniq
+      slots = week_rule.events.map { |v| v.strftime('%H:%M') }.uniq
       expect(slots).to eq(%w[15:00 15:17 16:20 16:37])
+    end
+
+    it 'selects events quite fast' do
+      time = Benchmark.realtime do
+        year_rule.events.select { |event| event.to_date == Date.today.next_week }
+      end
+
+      expect(time.to_i).to be_between(0, 2)
     end
 
     it 'works inside schedule as well' do
@@ -36,12 +54,12 @@ RSpec.describe MyRule do
       )
 
       schedule = Montrose::Schedule.build do |montrose_rule|
-        montrose_rule << longlasting_rule.show
+        montrose_rule << week_rule.show
         montrose_rule << rule2.show
       end
-      events = schedule.events
-                       .select { |event| event.to_date == Date.today + 3.days }
-                       .map { |v| v.strftime('%H:%M') }
+      events   = schedule.events
+                         .select { |event| event.to_date == Date.today + 3.days }
+                         .map { |v| v.strftime('%H:%M') }
       expect(events).to eq(%w[09:00 09:16 15:00 15:17 16:20 16:37 18:20 18:36])
     end
 
